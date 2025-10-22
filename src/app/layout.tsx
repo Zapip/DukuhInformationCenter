@@ -14,9 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Dukuh Information Center",
-  keywords: ["dukuh", "padukuhan Dukuh", "ngabean", "mirit", "kebumen", "umkm dukuh"],
   description: "A centralized information hub for Dukuh.",
-  // authors: ["M. Zafif Hilmi Al-hadi"],
+  keywords: ["dukuh", "padukuhan Dukuh", "ngabean", "mirit", "kebumen", "umkm dukuh"],
 };
 
 export default function RootLayout({

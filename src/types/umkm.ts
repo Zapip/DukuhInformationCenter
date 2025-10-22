@@ -7,12 +7,12 @@ interface lokasi {
 interface umkm {
     id: string;
     nama_usaha: string;
-    kategori: string;
+    kategori_usaha: string;
     deskripsi?: string;
     lokasi: lokasi;
     link_maps?: string;
-    image?: string;
-    kontak?: string;
+    image: string;
+    kontak: string;
     timestamp?: string | Date;
 }
 
