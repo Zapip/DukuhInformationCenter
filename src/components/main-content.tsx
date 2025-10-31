@@ -1,35 +1,12 @@
 "use client";
-// import { useEffect, useState } from "react";
-// import { getAllUMKM } from "@/lib/firestore";
-// import UmkmCard from "@/components/umkm-card";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import Image from "next/image";
-// import { umkm } from "@/types/umkm";
 import SplitText from "./SplitText";
 import AnimatedContent from "./AnimatedContent";
 
 
 export default function MainContent() {
-  // const [umkmList, setUmkmList] = useState<umkm[]>([]);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const data = await getAllUMKM();
-  //     setUmkmList(data as umkm[]);
-  //     setLoading(false);
-  //   };
-  //   fetchData();
-  // }, []);
-
-  // if (loading)
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <p className="text-gray-500 text-lg animate-pulse">Memuat data UMKM...</p>
-  //     </div>
-  //   );
-
   return (
     <main className="w-full min-h-screen flex flex-col items-center justify-center p-4">
       <AnimatedContent
@@ -44,9 +21,9 @@ export default function MainContent() {
         threshold={0.2}
         delay={0.3}
       >
-      <Image src="/1.webp" alt="Descriptive alt text" width={500} height={300} />
+      <Image src="/logo.webp" alt="Descriptive alt text" width={200} height={100} />
       </AnimatedContent>
-      <article className="flex flex-col gap-2 mb-4">
+      <article className="flex flex-col gap-2 my-4">
 
         <SplitText
           text="Selamat datang di Dukuh Information Center"
@@ -93,7 +70,7 @@ export default function MainContent() {
       >
         <article className="flex gap-2 items-center justify-center">
           <Button variant="default" size="lg" className="mt-4">
-            <Link href="/umkm/add" className="text-white font-bold">
+            <Link href="/explore" className="text-white font-bold">
               Jelajahi Dukuh
             </Link>
           </Button>
