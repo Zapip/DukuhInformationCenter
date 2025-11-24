@@ -1,6 +1,6 @@
 # Dukuh Information Center
 
-Aplikasi web ini berfungsi sebagai **pusat informasi terpusat untuk Padukuhan Dukuh** dan segala informasi yang berhubungan dengannya. Fokus utama saat ini adalah menampilkan data UMKM (Usaha Mikro, Kecil, dan Menengah) setempat.
+Aplikasi web ini berfungsi sebagai **pusat informasi terpusat untuk Pedukuhan Dukuh** dan segala informasi yang berhubungan dengannya. Fokus utama saat ini adalah menampilkan data UMKM (Usaha Mikro, Kecil, dan Menengah) setempat.
 
 -----
 

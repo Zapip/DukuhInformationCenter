@@ -1,10 +1,9 @@
 'use client';
-import { getAllUMKM } from "@/lib/firestore";
+import { createClient } from '@/lib/supabase/client';
 import { umkm } from "@/types/umkm";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-// import { Button } from "../ui/button";
 import Image from "next/image";
 import {
     Dialog,
@@ -14,22 +13,26 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 
 const ExploreCard = () => {
-    const [umkmList, setUmkmList] = useState<umkm[]>([]);
+    const [umkms, setUmkms] = useState<umkm[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedUMKM, setSelectedUMKM] = useState<umkm | null>(null);
     const [open, setOpen] = useState(false);
-
+    const [selectedUMKM, setSelectedUMKM] = useState<umkm | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const data = await getAllUMKM();
-            setUmkmList(data as umkm[]);
+        async function fetchUmkms() {
+            setLoading(true);
+            const supabase = createClient();
+            const { data, error } = await supabase.from('umkm').select('*');
+            if (error) console.log('Error fetching data:', error);
+            else setUmkms(data);
             setLoading(false);
-        };
-        fetchData();
+        }
+        fetchUmkms();
     }, []);
 
     if (loading)
@@ -40,33 +43,7 @@ const ExploreCard = () => {
         );
     return (
         <>
-            {/* {umkmList.map((umkmItem) => (
-                <Card key={umkmItem.id}>
-                    <CardHeader>
-                        <CardTitle>{umkmItem.nama_usaha}</CardTitle>
-                        <CardDescription>
-                            <article className="flex flex-col gap-2">
-                                <section className="flex flex-col gap-2">
-                                    <p className="text-justify line-clamp-2">{umkmItem.deskripsi}</p>
-                                    <p className="text-justify line-clamp-2">Alamat: {umkmItem.lokasi.alamat}</p>
-                                </section>
-                                <section className="flex gap-2 flex-wrap">
-                                    <Badge className="text-white">{umkmItem.kontak}</Badge>
-                                    <Badge className="text-white">{umkmItem.kategori_usaha}</Badge>
-                                </section>
-                            </article>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Image src={umkmItem.image} alt={umkmItem.nama_usaha} width={50} height={30} />
-                    </CardContent>
-                    <CardFooter className="flex justify-end">
-                        <Button>Tampilkan Detail</Button>
-                    </CardFooter>
-                </Card>
-
-            ))} */}
-            {umkmList.map((umkmItem) => (
+            {umkms.map((umkmItem) => (
                 <Dialog key={umkmItem.id} open={open && selectedUMKM?.id === umkmItem.id} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Card
@@ -77,13 +54,10 @@ const ExploreCard = () => {
                             className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
                         >
                             <CardHeader>
-                                <CardTitle>{umkmItem.nama_usaha}</CardTitle>
+                                <CardTitle className="text-lg sm:text-2xl">{umkmItem.nama_usaha}</CardTitle>
                                 <CardDescription>
                                     <article className="flex flex-col gap-2">
-                                        <section className="flex flex-col gap-2">
-                                            <p className="text-justify line-clamp-2">{umkmItem.deskripsi}</p>
-                                            <p className="text-justify line-clamp-2">Alamat: {umkmItem.lokasi.alamat}</p>
-                                        </section>
+                                            <p className="text-justify line-clamp-3">{umkmItem.deskripsi}</p>
                                         <section className="flex gap-2 flex-wrap">
                                             <Badge className="text-white">{umkmItem.kontak}</Badge>
                                             <Badge className="text-white">{umkmItem.kategori_usaha}</Badge>
@@ -106,7 +80,7 @@ const ExploreCard = () => {
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>{selectedUMKM?.nama_usaha}</DialogTitle>
-                            <DialogDescription>{selectedUMKM?.kategori_usaha}</DialogDescription>
+                            <DialogDescription><Badge className="text-white">{selectedUMKM?.kategori_usaha}</Badge></DialogDescription>
                         </DialogHeader>
                         <article className="flex flex-col gap-4">
                             <Image
@@ -116,13 +90,11 @@ const ExploreCard = () => {
                                 height={400}
                                 className="rounded-md object-cover w-full h-60"
                             />
-                            <p className="text-sm text-gray-700">{selectedUMKM?.deskripsi}</p>
-                            <p className="text-sm text-gray-700">
-                                <strong>Alamat:</strong> {selectedUMKM?.lokasi.alamat}
-                            </p>
+                            <p className="text-sm text-gray-700 text-justify">{selectedUMKM?.deskripsi}</p>
                             <p className="text-sm text-gray-700">
                                 <strong>Kontak:</strong> {selectedUMKM?.kontak}
                             </p>
+                            <Link href={selectedUMKM?.lokasi ?? "-"} target="_blank" rel="noopener noreferrer"><Button className='w-full hover:cursor-pointer'>Lihat di Maps</Button></Link>
                         </article>
                     </DialogContent>
                 </Dialog>

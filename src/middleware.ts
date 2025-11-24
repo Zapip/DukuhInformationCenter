@@ -1,27 +1,13 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server'
+import { createClient } from '@/lib/supabase/middleware'
 
-/**
- * Middleware to handle incoming requests.
- * You can use this to add authentication, logging, or other request processing logic.
- */
-export function middleware(request: NextRequest) {
-    // Example: Log the request URL
-    console.log(`Middleware triggered for: ${request.nextUrl}`);
-
-    // Example: Redirect logic
-    if (request.nextUrl.pathname === '/restricted') {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
-
-    // Continue to the next middleware or route handler
-    return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  // update user's auth session
+  return await createClient(request)
 }
 
-/**
- * Configure the paths where this middleware should run.
- * Example: Apply middleware only to specific routes.
- */
-export const config = {
-    matcher: ['/restricted', '/api/:path*'],
-};
+export const config = { 
+  matcher: [
+     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+}

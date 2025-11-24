@@ -5,7 +5,6 @@ import Image from "next/image";
 import SplitText from "./SplitText";
 import AnimatedContent from "./AnimatedContent";
 
-
 export default function MainContent() {
   return (
     <main className="w-full min-h-screen flex flex-col items-center justify-center p-4">
@@ -21,7 +20,7 @@ export default function MainContent() {
         threshold={0.2}
         delay={0.3}
       >
-      <Image src="/logo.webp" alt="Descriptive alt text" width={200} height={100} />
+        <Image src="/logo.webp" alt="Descriptive alt text" width={200} height={100} />
       </AnimatedContent>
       <article className="flex flex-col gap-2 my-4">
 
@@ -41,8 +40,8 @@ export default function MainContent() {
         />
         <h2 className="text-center text-sm sm:text-2xl">
           <SplitText
-            text="Pusat segala informasi yang berhubungan dengan padukuhan Dukuh"
-            className="text-center text-sm sm:text-2xl"
+            text="Pusat segala informasi yang berhubungan dengan pedukuhan Dukuh, Desa Ngabean Kecamatan Mirit, Kabupaten Kebumen."
+            className="text-center text-sm sm:text-2xl sm:w-2/3"
             delay={100}
             duration={1.2}
             ease="power3.out"
@@ -75,20 +74,10 @@ export default function MainContent() {
             </Link>
           </Button>
           <Button variant="outline" size="lg" className="mt-4">
-            <Link href="/umkm/add" className="text-secondary font-bold">Tentang Kami</Link>
+            <Link href="/profile" className="text-secondary font-bold">Tentang Kami</Link>
           </Button>
         </article>
       </AnimatedContent>
-
-      {/* {umkmList.length === 0 ? (
-        <p className="text-center text-gray-500">Belum ada data UMKM.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {umkmList.map((item) => (
-            <UmkmCard key={item.id} {...item} />
-          ))}
-        </div>
-      )} */}
     </main>
   );
 }
