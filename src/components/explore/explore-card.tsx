@@ -1,5 +1,5 @@
 'use client';
-import { createClient } from '@/lib/supabase/client';
+import {  supabase } from '@/lib/supabase/client';
 import { umkm } from "@/types/umkm";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
@@ -26,8 +26,8 @@ const ExploreCard = () => {
     useEffect(() => {
         async function fetchUmkms() {
             setLoading(true);
-            const supabase = createClient();
-            const { data, error } = await supabase.from('umkm').select('*');
+            const supabaseClient = supabase;
+            const { data, error } = await supabaseClient.from('umkm').select('*');
             if (error) console.log('Error fetching data:', error);
             else setUmkms(data);
             setLoading(false);

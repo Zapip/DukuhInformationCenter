@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/footer";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode;  
 }>) {
   return (
     <html lang="en">
@@ -30,6 +31,7 @@ export default function RootLayout({
           />
           <section className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white mask-[radial-gradient(ellipse_at_center,transparent_20%,black)]"></section>
           <section className="w-full relative z-20 min-h-screen">
+             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
             {children}
             <Footer/>
           </section>
