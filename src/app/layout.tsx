@@ -11,7 +11,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "Dukuh Information Center",
-  description: "A centralized information hub for Dukuh.",
+  description: "Pusat data dan informasi pedukuhan Dukuh, Ngabean, Mirit, Kebumen.",
   keywords: ["dukuh", "pedukuhan Dukuh", "ngabean", "mirit", "kebumen", "umkm dukuh", "pusat data dukuh", "informasi dukuh", "dukoh", "dukoh information center", "dukoh ic", "dukoh data hub"],
 };
 
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;  
 }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <body
         className={`${plusJakartaSans.variable} antialiased`}
       >
