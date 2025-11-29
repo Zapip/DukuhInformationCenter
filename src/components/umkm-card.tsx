@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { umkm } from "@/types/umkm";
+import { umkm } from "@/types/JelajahDukuh";
 
 export default function UmkmCard({
     nama_usaha,

@@ -9,7 +9,7 @@ const ExplorePage = () => {
                 <Image src="/logo.webp" alt="Descriptive alt text" width={25} height={12.5} />
                 <h1 className="text-xl sm:text-3xl text-primary font-bold"><Link href="/">Jelajahi Pedukuhan Dukuh</Link></h1>
             </nav>
-            <article className="max-h-screen overflow-y-scroll border-2 border-red-600 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mt-4 rounded-lg">
+            <article className="max-h-screen overflow-y-scroll grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mt-4 rounded-lg">
                 <ExploreCard />
             </article>
         </article>

@@ -1,6 +1,6 @@
 'use client';
-import {  supabase } from '@/lib/supabase/client';
-import { umkm } from "@/types/umkm";
+import { supabase } from '@/lib/supabase/client';
+import { umkm } from "@/types/JelajahDukuh";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -57,7 +57,7 @@ const ExploreCard = () => {
                                 <CardTitle className="text-lg sm:text-2xl">{umkmItem.nama_usaha}</CardTitle>
                                 <CardDescription>
                                     <article className="flex flex-col gap-2">
-                                            <p className="text-justify line-clamp-3">{umkmItem.deskripsi}</p>
+                                        <p className="text-justify line-clamp-3">{umkmItem.deskripsi}</p>
                                         <section className="flex gap-2 flex-wrap">
                                             <Badge className="text-white">{umkmItem.kontak}</Badge>
                                             <Badge className="text-white">{umkmItem.kategori_usaha}</Badge>

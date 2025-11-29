@@ -2,28 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import { User } from '@/types/user'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Users, 
-  Database, 
-  LogOut,
+import {
+  Users,
   Clock,
-  Eye
+  Eye,
+  Loader2,
+  Store
 } from 'lucide-react'
+import Link from 'next/link'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 export default function AdminPage() {
+  const { data, loading: analyticsLoading, error } = useAnalytics()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
     totalTables: 0,
     lastLogin: '',
   })
-  const router = useRouter()
 
   useEffect(() => {
     getUser()
@@ -31,9 +31,8 @@ export default function AdminPage() {
 
   const getUser = async () => {
     try {
-      // Middleware sudah protect route, jadi tinggal ambil user aja
       const { data: { user: currentUser } } = await supabase.auth.getUser()
-      
+
       if (currentUser) {
         setUser({
           email: currentUser.email!,
@@ -53,12 +52,6 @@ export default function AdminPage() {
     }
   }
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth')
-    router.refresh()
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -72,48 +65,25 @@ export default function AdminPage() {
 
   const featureCards = [
     {
-      title: 'User Management',
-      description: 'Kelola pengguna, hak akses, dan data user',
-      icon: Users,
+      title: 'Kelola Jelajah dukuh',
+      description: 'Kelola data UMKM, wisata, dan kuliner dukuh dll',
+      icon: Store,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950',
-      href: '/admin/users'
+      href: '/admin/kelola-jelajah-dukuh'
     },
     {
-      title: 'Database',
-      description: 'Kelola tabel, data, dan struktur database',
-      icon: Database,
+      title: 'kelola Profil',
+      description: 'Perbarui informasi profil dukuh dan pengaturan situs',
+      icon: Users,
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950',
-      href: '/admin/database'
+      href: '/admin/kelola-profil'
     },
   ]
 
   return (
     <section className="min-h-screen">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {user?.email?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Dashboard Admin</h1>
-                <p className="text-sm text-muted-foreground">Selamat datang, {user?.email}</p>
-              </div>
-            </div>
-            <Button onClick={handleLogout} variant="destructive" className="gap-2">
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
@@ -124,7 +94,18 @@ export default function AdminPage() {
               <Eye className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <h1 className="text-4xl md:text-6xl text-primary font-bold">1925±</h1>
+              {analyticsLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="text-muted-foreground">Memuat...</span>
+                </div>
+              ) : error ? (
+                <div className="text-destructive text-sm">{error}</div>
+              ) : (
+                <h1 className="text-4xl md:text-6xl text-primary font-bold">
+                  {data?.totalVisitors.toLocaleString('id-ID') || 0}
+                </h1>
+              )}
             </CardContent>
           </Card>
 
@@ -141,7 +122,7 @@ export default function AdminPage() {
         </article>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <article className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {featureCards.map((feature, index) => {
             const Icon = feature.icon
             return (
@@ -156,14 +137,14 @@ export default function AdminPage() {
                   <CardDescription>{feature.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="secondary" className="w-full">
-                    Buka {feature.title}
+                  <Button asChild variant="secondary" className="w-full font-semibold text-white">
+                    <Link href={feature.href}>Buka {feature.title}</Link>
                   </Button>
                 </CardContent>
               </Card>
             )
           })}
-        </div>
+        </article>
 
         {/* Admin Info */}
         <Card>
