@@ -1,5 +1,6 @@
-export const KATEGORI_USAHA = [
+export const KATEGORI = [
   'UMKM',
+  'Produsen',
   'Wisata',
   'Kuliner',
   'Kerajinan',
@@ -11,7 +12,7 @@ interface JelajahDukuh {
     id: string;
     nama_usaha: string;
     kategori_usaha: string;
-    deskripsi?: string;
+    deskripsi: string;
     lokasi: string
     link_maps?: string;
     image_url: string;

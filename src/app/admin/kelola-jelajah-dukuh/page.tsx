@@ -11,11 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Pencil, Trash2, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { Plus, Pencil, Trash2, Image as ImageIcon, Loader2, Search } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import Image from 'next/image'
-import { JelajahDukuh, KATEGORI_USAHA } from '@/types/JelajahDukuh'
+import { JelajahDukuh, KATEGORI } from '@/types/JelajahDukuh'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 
 export default function KelolaJelajahDukuhPage() {
   const [data, setData] = useState<JelajahDukuh[]>([])
@@ -24,6 +24,11 @@ export default function KelolaJelajahDukuhPage() {
   const [editingItem, setEditingItem] = useState<JelajahDukuh | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+  const [searchQuery, setSearchQuery] = useState('')
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -44,15 +49,19 @@ export default function KelolaJelajahDukuhPage() {
     try {
       setLoading(true)
       const { data: result, error } = await supabase
-        .from('jelajah_dukuh')
+        .from('umkm')
         .select('*')
         .order('created_at', { ascending: false })
 
       if (error) throw error
       setData(result || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching data:', error)
-      setError(error.message)
+      if (error instanceof Error) {
+        setError(error.message)
+      } else {
+        setError('Terjadi kesalahan saat mengambil data.')
+      }
     } finally {
       setLoading(false)
     }
@@ -127,7 +136,6 @@ export default function KelolaJelajahDukuhPage() {
     try {
       let imageUrl = editingItem?.image_url || null
 
-      // Upload image jika ada file baru
       if (imageFile) {
         imageUrl = await uploadImage(imageFile)
       }
@@ -138,9 +146,8 @@ export default function KelolaJelajahDukuhPage() {
       }
 
       if (editingItem) {
-        // Update
         const { error } = await supabase
-          .from('jelajah_dukuh')
+          .from('umkm')
           .update(dataToSave)
           .eq('id', editingItem.id)
 
@@ -148,7 +155,7 @@ export default function KelolaJelajahDukuhPage() {
       } else {
         // Insert
         const { error } = await supabase
-          .from('jelajah_dukuh')
+          .from('umkm')
           .insert([dataToSave])
 
         if (error) throw error
@@ -157,9 +164,10 @@ export default function KelolaJelajahDukuhPage() {
       await fetchData()
       setIsDialogOpen(false)
       resetForm()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving data:', error)
-      setError(error.message)
+      if (error instanceof Error)
+        setError(error.message)
     } finally {
       setSubmitting(false)
     }
@@ -170,15 +178,19 @@ export default function KelolaJelajahDukuhPage() {
 
     try {
       const { error } = await supabase
-        .from('jelajah_dukuh')
+        .from('umkm')
         .delete()
         .eq('id', id)
 
       if (error) throw error
       await fetchData()
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert('Gagal menghapus data: ' + error.message)
+      } else {
+        alert('Gagal menghapus data: Terjadi kesalahan tidak terduga.')
+      }
       console.error('Error deleting data:', error)
-      alert('Gagal menghapus data: ' + error.message)
     }
   }
 
@@ -186,6 +198,7 @@ export default function KelolaJelajahDukuhPage() {
     const colors: Record<string, string> = {
       'UMKM': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
       'Wisata': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'Produsen': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       'Kuliner': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
       'Kerajinan': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
       'Jasa': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
@@ -194,172 +207,199 @@ export default function KelolaJelajahDukuhPage() {
     return colors[category] || colors['Lainnya']
   }
 
+  // Filter data based on search query
+  const filteredData = data.filter((item) => {
+    const query = searchQuery.toLowerCase()
+    return (
+      item.nama_usaha.toLowerCase().includes(query) ||
+      item.deskripsi.toLowerCase().includes(query) ||
+      item.kategori_usaha.toLowerCase().includes(query)
+    )
+  })
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentData = filteredData.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/admin">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Kembali
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Kelola Jelajah Dukuh</h1>
-                <p className="text-sm text-muted-foreground">Kelola data UMKM, wisata, dan kuliner</p>
-              </div>
+    <article className="min-h-screen container mx-auto flex flex-col gap-6 items-end p-4">
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button className='w-fit' onClick={() => handleOpenDialog()}>
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Data
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="w-full max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? 'Edit Data' : 'Tambah Data Baru'}</DialogTitle>
+            <DialogDescription>
+              {editingItem ? 'Perbarui informasi data jelajah dukuh' : 'Tambahkan data baru untuk jelajah dukuh'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <section className="space-y-2">
+              <Label htmlFor="nama_usaha">Nama *</Label>
+              <Input
+                id="nama_usaha"
+                value={formData.nama_usaha}
+                onChange={(e) => setFormData({ ...formData, nama_usaha: e.target.value })}
+                required
+                placeholder="Nama usaha, tempat wisata, atau kegiatan"
+              />
+            </section>
+
+            <section className="space-y-2">
+              <Label htmlFor="kategori_usaha">Kategori *</Label>
+              <Select
+                value={formData.kategori_usaha}
+                onValueChange={(value) => setFormData({ ...formData, kategori_usaha: value })}
+                required
+              >
+                <SelectTrigger className='w-full'>
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  {KATEGORI.map((kategori) => (
+                    <SelectItem key={kategori} value={kategori}>
+                      {kategori}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </section>
+            <div className="space-y-2">
+              <Label htmlFor="deskripsi">Deskripsi *</Label>
+              <Textarea
+                id="deskripsi"
+                value={formData.deskripsi}
+                onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                required
+                rows={4}
+                placeholder="Jelaskan tentang usaha ini..."
+              />
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => handleOpenDialog()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Tambah Data
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>{editingItem ? 'Edit Data' : 'Tambah Data Baru'}</DialogTitle>
-                  <DialogDescription>
-                    {editingItem ? 'Perbarui informasi data jelajah dukuh' : 'Tambahkan data baru untuk jelajah dukuh'}
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="nama_usaha">Nama Usaha *</Label>
-                    <Input
-                      id="nama_usaha"
-                      value={formData.nama_usaha}
-                      onChange={(e) => setFormData({ ...formData, nama_usaha: e.target.value })}
-                      required
-                      placeholder="Contoh: Warung Makan Pak Budi"
-                    />
-                  </div>
+            <div className="space-y-2">
+              <Label htmlFor="kontak">Kontak</Label>
+              <Input
+                id="kontak"
+                value={formData.kontak}
+                onChange={(e) => setFormData({ ...formData, kontak: e.target.value })}
+                placeholder="Contoh: 081234567890"
+              />
+            </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="kategori_usaha">Kategori Usaha *</Label>
-                    <Select
-                      value={formData.kategori_usaha}
-                      onValueChange={(value) => setFormData({ ...formData, kategori_usaha: value })}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih kategori" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {KATEGORI_USAHA.map((kategori) => (
-                          <SelectItem key={kategori} value={kategori}>
-                            {kategori}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="space-y-2">
+              <Label htmlFor="lokasi">Lokasi Google Maps (URL)</Label>
+              <Input
+                id="lokasi"
+                value={formData.lokasi}
+                onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                placeholder="https://maps.google.com/..."
+              />
+            </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="deskripsi">Deskripsi *</Label>
-                    <Textarea
-                      id="deskripsi"
-                      value={formData.deskripsi}
-                      onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-                      required
-                      rows={4}
-                      placeholder="Jelaskan tentang usaha ini..."
-                    />
-                  </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">Gambar</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              {imagePreview && (
+                <div className="mt-2">
+                  <Image
+                    width={400}
+                    height={192}
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="kontak">Kontak</Label>
-                    <Input
-                      id="kontak"
-                      value={formData.kontak}
-                      onChange={(e) => setFormData({ ...formData, kontak: e.target.value })}
-                      placeholder="Contoh: 081234567890"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="lokasi">Lokasi Google Maps (URL)</Label>
-                    <Input
-                      id="lokasi"
-                      value={formData.lokasi}
-                      onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
-                      placeholder="https://maps.google.com/..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Gambar</Label>
-                    <Input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                    {imagePreview && (
-                      <div className="mt-2">
-                        <Image
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setIsDialogOpen(false)
-                        resetForm()
-                      }}
-                      disabled={submitting}
-                    >
-                      Batal
-                    </Button>
-                    <Button type="submit" disabled={submitting}>
-                      {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      {editingItem ? 'Update' : 'Simpan'}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </header>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsDialogOpen(false)
+                  resetForm()
+                }}
+                disabled={submitting}
+              >
+                Batal
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {editingItem ? 'Update' : 'Simpan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="container mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Data Jelajah Dukuh</CardTitle>
-            <CardDescription>
-              Total: {data.length} data
-            </CardDescription>
+            <article className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <section>
+                <CardTitle>Data Jelajahi Dukuh</CardTitle>
+                <CardDescription>
+                  <Badge className="text-white mt-2">
+                  Total: {data.length} data pada Halaman {currentPage} dari {totalPages || 1}
+                  </Badge>
+                </CardDescription>
+              </section>
+              <section className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Cari nama, deskripsi, kategori..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </section>
+            </article>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex justify-center py-8">
+              <section className="flex justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
+              </section>
             ) : data.length === 0 ? (
-              <div className="text-center py-8">
+              <section className="text-center py-8">
                 <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Belum ada data. Klik "Tambah Data" untuk memulai.</p>
-              </div>
+                <p className="text-muted-foreground">Belum ada data. Klik &quot;Tambah Data&quot; untuk memulai.</p>
+              </section>
+            ) : filteredData.length === 0 ? (
+              <section className="text-center py-8">
+                <p className="text-muted-foreground">Tidak ada hasil yang ditemukan untuk &quot;{searchQuery}&quot;</p>
+              </section>
             ) : (
-              <div className="overflow-x-auto">
+              <section className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -371,14 +411,20 @@ export default function KelolaJelajahDukuhPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.map((item) => (
+                    {currentData.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>
                           {item.image_url ? (
                             <Image
+                              width={64}
+                              height={64}
                               src={item.image_url}
                               alt={item.nama_usaha}
-                              className="w-16 h-16 object-cover rounded"
+                              className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => {
+                                setPreviewImage(item.image_url)
+                                setIsPreviewOpen(true)
+                              }}
                             />
                           ) : (
                             <div className="w-16 h-16 bg-muted rounded flex items-center justify-center">
@@ -389,7 +435,7 @@ export default function KelolaJelajahDukuhPage() {
                         <TableCell className="font-medium">
                           <div>
                             <p>{item.nama_usaha}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-1">
+                            <p className="text-sm text-muted-foreground line-clamp-1 text-wrap">
                               {item.deskripsi}
                             </p>
                           </div>
@@ -422,11 +468,64 @@ export default function KelolaJelajahDukuhPage() {
                     ))}
                   </TableBody>
                 </Table>
+              </section>
+            )}
+
+            {/* Pagination */}
+            {!loading && data.length > 0 && (
+              <div className="mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
             )}
           </CardContent>
         </Card>
       </main>
-    </div>
+
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Preview Gambar</DialogTitle>
+          </DialogHeader>
+          {previewImage && (
+            <div className="relative w-full h-screen max-h-[80vh]">
+              <Image
+                src={previewImage}
+                alt="Preview"
+                fill
+                className="object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </article>
   )
 }

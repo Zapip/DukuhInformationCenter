@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, Phone, Store, Users, UserStarIcon } from "lucide-react";
+import { Building, Store, Users, UserStarIcon } from "lucide-react";
 import Image from "next/image";
 import {
     Carousel,
