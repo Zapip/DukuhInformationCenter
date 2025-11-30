@@ -10,7 +10,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
             <section className="mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <header className="text-center md:text-left mb-4 md:mb-0">
-                        <h1 className="text-xl font-semibold text-secondary">Pusat Informasi Dukuh</h1>
+                        <h1 className="text-xl font-semibold text-[#fff48d]">Pusat Informasi Dukuh</h1>
                         <p className="text-sm">Pusat segala informasi yang berhubungan dengan pedukuhan Dukuh.</p>
                     </header>
                     <Link

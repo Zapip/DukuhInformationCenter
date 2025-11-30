@@ -1,11 +1,22 @@
 interface Profile {
-    id: string;
-    nama: string;
-    umur: number;
-    alamat: string;
-    pekerjaan: string;
-    bio?: string;
-    foto_profil_url?: string;
+    id: string
+    name: string
+    deskripsi: string
+    total_penduduk: number
+    total_umkm: number
+    total_fasilitas_umum: number
+    nama_kontak: string
+    kontak: string
+    created_at: string
+    updated_at: string
 }
 
-export type { Profile };
+interface ProfileImage {
+    id: string
+    profile_id: string
+    image_url: string
+    order_index: number
+    created_at: string
+}
+
+export type { Profile, ProfileImage };

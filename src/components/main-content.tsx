@@ -43,7 +43,7 @@ export default function MainContent() {
             text="Pusat segala informasi yang berhubungan dengan pedukuhan Dukuh, Desa Ngabean Kecamatan Mirit, Kabupaten Kebumen."
             className="text-center text-sm sm:text-2xl sm:w-2/3"
             delay={100}
-            duration={1.2}
+            duration={0.8}
             ease="power3.out"
             splitType="chars"
             from={{ opacity: 0, y: 40 }}
@@ -73,8 +73,8 @@ export default function MainContent() {
               Jelajahi Dukuh
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="mt-4">
-            <Link href="/profile" className="text-secondary font-bold">Tentang Kami</Link>
+          <Button variant="outline" size="lg" className="mt-4 border-primary border-2">
+            <Link href="/profile" className="text-primary font-bold">Tentang Kami</Link>
           </Button>
         </article>
       </AnimatedContent>
