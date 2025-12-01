@@ -165,14 +165,63 @@ export default function KelolaProfilPage() {
 
       if (updateError) throw updateError
 
-      if (deletedImageIds.length > 0) {
+      // Delete removed images (both from storage and database)
+      if (deletedImages.length > 0) {
+        // Delete files from storage one by one with better error handling
+        for (const image of deletedImages) {
+          try {
+            // Extract file path from URL
+            // URL format: https://xxx.supabase.co/storage/v1/object/public/profil-images/profile/filename.ext
+            const url = new URL(image.image_url)
+            const pathParts = url.pathname.split('/profil-images/')
+
+            if (pathParts.length > 1) {
+              const filePath = pathParts[1] // e.g., "profile/8lea60kuvae-1764561882091.jpeg"
+              console.log('Attempting to delete:', filePath)
+
+              const { data, error: storageError } = await supabase.storage
+                .from('profil-images')
+                .remove([filePath])
+
+              if (storageError) {
+                console.error('Storage deletion error:', storageError)
+                console.error('Failed to delete file:', filePath)
+                // Throw error to prevent database deletion if storage fails
+                throw new Error(`Gagal menghapus file dari storage: ${storageError.message}`)
+              }
+
+              console.log('Successfully deleted from storage:', data)
+            } else {
+              console.error('Could not extract file path from URL:', image.image_url)
+            }
+          } catch (err) {
+            console.error('Error during file deletion:', err)
+            throw err
+          }
+        }
+
+        // Delete from database only after all storage deletions succeed
         const { error: deleteError } = await supabase
           .from('profile_images')
           .delete()
           .in('id', deletedImageIds)
 
-        if (deleteError) throw deleteError
+        if (deleteError) {
+          console.error('Database deletion error:', deleteError)
+          throw deleteError
+        }
+
+        console.log('Successfully deleted from database')
       }
+
+      // if (deletedImageIds.length > 0) {
+      //   const { error: deleteError } = await supabase
+      //     .from('profile_images')
+      //     .delete()
+      //     .in('id', deletedImageIds)
+
+      //   if (deleteError) throw deleteError
+      // }
 
       const remainingImagesCount = images.length
 

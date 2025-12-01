@@ -176,6 +176,30 @@ export default function KelolaJelajahDukuhPage() {
     if (!confirm('Yakin ingin menghapus data ini?')) return
 
     try {
+      // Get the item data first to extract image URL
+      const itemToDelete = data.find(item => item.id === id)
+
+      if (itemToDelete && itemToDelete.image_url) {
+        // Extract file path from URL
+        // URL format: https://xxx.supabase.co/storage/v1/object/public/jelajah-images/filename.ext
+        const urlParts = itemToDelete.image_url.split('/jelajah-images/')
+
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1] // e.g., "w4jfib22rr-1764401494984.webp"
+
+          // Delete from storage
+          const { error: storageError } = await supabase.storage
+            .from('jelajah-images')
+            .remove([filePath])
+          if (storageError) {
+            console.error('Error deleting from storage:', storageError)
+          } else {
+            console.log('Successfully deleted file from storage')
+          }
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from('umkm')
         .delete()
@@ -367,7 +391,7 @@ export default function KelolaJelajahDukuhPage() {
                 <CardTitle>Data Jelajahi Dukuh</CardTitle>
                 <CardDescription>
                   <Badge className="text-white mt-2">
-                  Total: {data.length} data pada Halaman {currentPage} dari {totalPages || 1}
+                    Total: {data.length} data pada Halaman {currentPage} dari {totalPages || 1}
                   </Badge>
                 </CardDescription>
               </section>
