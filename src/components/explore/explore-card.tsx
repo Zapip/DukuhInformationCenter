@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 
 const ExploreCard = () => {
@@ -49,9 +49,10 @@ const ExploreCard = () => {
 
     if (loading)
         return (
-            <div className="flex justify-center items-center h-screen">
+            <section className="w-full flex justify-center gap-2 items-center h-screen">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 <p className="text-gray-500 text-lg animate-pulse">Memuat data UMKM...</p>
-            </div>
+            </section>
         );
     return (
         <>

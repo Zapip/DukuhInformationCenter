@@ -159,11 +159,11 @@ export default function AdminPage() {
                 <p className="text-base font-semibold">{user?.email}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">User ID</p>
+                <p className="text-sm font-medium text-muted-foreground">ID Pengguna</p>
                 <p className="text-xs font-mono bg-muted px-2 py-1 rounded">{user?.id}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Account Created</p>
+                <p className="text-sm font-medium text-muted-foreground">Akun Dibuat</p>
                 <p className="text-base font-semibold">
                   {user?.created_at ? new Date(user.created_at).toLocaleDateString('id-ID', {
                     weekday: 'long',
@@ -174,7 +174,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Role</p>
+                <p className="text-sm font-medium text-muted-foreground">Peran</p>
                 <Badge className="bg-primary">Super Admin</Badge>
               </div>
             </div>

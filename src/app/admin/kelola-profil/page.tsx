@@ -33,6 +33,7 @@ export default function KelolaProfilPage() {
   const [newImages, setNewImages] = useState<File[]>([])
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([])
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([])
+  const [deletedImages, setDeletedImages] = useState<ProfileImage[]>([])
 
   useEffect(() => {
     fetchData()
@@ -41,8 +42,6 @@ export default function KelolaProfilPage() {
   const fetchData = async () => {
     try {
       setLoading(true)
-
-      // Fetch profile (single record)
       const { data: profileData, error: profileError } = await supabase
         .from('profile')
         .select('*')
@@ -104,7 +103,11 @@ export default function KelolaProfilPage() {
   }
 
   const removeExistingImage = (imageId: string) => {
-    setDeletedImageIds([...deletedImageIds, imageId])
+    const imageToDelete = images.find((img) => img.id === imageId)
+    if (imageToDelete) {
+      setDeletedImages([...deletedImages, imageToDelete])
+      setDeletedImageIds([...deletedImageIds, imageId])
+    }
     setImages(images.filter((img) => img.id !== imageId))
   }
 
@@ -162,7 +165,6 @@ export default function KelolaProfilPage() {
 
       if (updateError) throw updateError
 
-      // Delete removed images
       if (deletedImageIds.length > 0) {
         const { error: deleteError } = await supabase
           .from('profile_images')
@@ -172,19 +174,21 @@ export default function KelolaProfilPage() {
         if (deleteError) throw deleteError
       }
 
-      // Upload new images
+      const remainingImagesCount = images.length
+
       for (let i = 0; i < newImages.length; i++) {
-        const orderIndex = images.length + i
+        const orderIndex = remainingImagesCount + i
         await uploadImage(newImages[i], profile.id, orderIndex)
       }
 
-      // Refresh data
-      await fetchData()
-
-      // Reset new images
+      // Reset state BEFORE fetching to prevent race condition
       setNewImages([])
       setNewImagePreviews([])
       setDeletedImageIds([])
+      setDeletedImages([])
+
+      // Refresh data after state is reset
+      await fetchData()
 
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
@@ -455,13 +459,13 @@ export default function KelolaProfilPage() {
               )}
 
               {/* Upload Button */}
-              <div className="flex justify-center pt-4">
-                <Label htmlFor="images" className="cursor-pointer">
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 hover:border-primary hover:bg-primary/5 transition-colors text-center">
+              <section className="flex justify-center pt-4">
+                <Label htmlFor="images" className="w-full cursor-pointer">
+                  <section className="w-full border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 hover:border-primary hover:bg-primary/5 transition-colors text-center">
                     <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm font-medium">Upload Foto</p>
                     <p className="text-xs text-muted-foreground mt-1">Klik untuk memilih foto</p>
-                  </div>
+                  </section>
                   <Input
                     id="images"
                     type="file"
@@ -471,13 +475,13 @@ export default function KelolaProfilPage() {
                     className="hidden"
                   />
                 </Label>
-              </div>
+              </section>
 
               {images.length === 0 && newImagePreviews.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
+                <section className="text-center py-8 text-muted-foreground">
                   <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Belum ada foto. Upload foto untuk memulai.</p>
-                </div>
+                </section>
               )}
             </CardContent>
           </Card>
@@ -493,8 +497,7 @@ export default function KelolaProfilPage() {
               Reset
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              <Save className="mr-2 h-4 w-4" />
+              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Simpan Perubahan
             </Button>
           </section>

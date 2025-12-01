@@ -53,7 +53,8 @@ export default function AuthPage() {
             <Card className="w-full max-w-md">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold flex flex-col items-center justify-center gap-2">
-                        <Image src="/logo.webp" alt="Logo" width={94} height={94} />
+                        <Image src="/logo.webp" alt="Logo Pedukuhan Dukuh" width={94} height={94}
+                         style={{ width: 'auto', height: 'auto' }} />
                         <h1>Halaman Masuk Admin</h1>
                     </CardTitle>
                     <CardDescription>Masukkan kredensial admin Anda</CardDescription>
