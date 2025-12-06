@@ -20,8 +20,9 @@ export default function MainContent() {
         threshold={0.2}
         delay={0.3}
       >
-        <Image src="/logo.webp" alt="Logo Pedukuhan Dukuh" width={200} height={100}
-          style={{ width: 'auto', height: 'auto' }} />
+        <Image src="/logo.webp" alt="Logo Pedukuhan Dukuh" width={200} height={100} className="sm:size-auto"
+          // style={{ width: 'auto', height: 'auto' }}
+           />
       </AnimatedContent>
       <article className="flex flex-col gap-2 my-4">
 
@@ -44,7 +45,7 @@ export default function MainContent() {
             text="Pusat segala informasi yang berhubungan dengan pedukuhan Dukuh, Desa Ngabean Kecamatan Mirit, Kabupaten Kebumen."
             className="text-center text-sm sm:text-2xl sm:w-2/3"
             delay={100}
-            duration={0.8}
+            duration={0.3}
             ease="power3.out"
             splitType="chars"
             from={{ opacity: 0, y: 40 }}
