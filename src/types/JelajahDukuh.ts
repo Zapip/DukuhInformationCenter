@@ -5,6 +5,7 @@ export const KATEGORI = [
   'Kuliner',
   'Kerajinan',
   'Jasa',
+  'Kegiatan',
   'Lainnya'
 ] as const
 
@@ -17,7 +18,7 @@ interface JelajahDukuh {
     link_maps?: string;
     image_url: string;
     kontak: string;
-    timestamp?: string | Date;
+    created_at?: string | Date;
 }
 
 export type { JelajahDukuh };

@@ -20,9 +20,9 @@ export default function MainContent() {
         threshold={0.2}
         delay={0.3}
       >
-        <Image src="/logo.webp" alt="Logo Pedukuhan Dukuh" width={200} height={100} className="sm:size-auto"
-          // style={{ width: 'auto', height: 'auto' }}
-           />
+        <Image src="/logo.webp" alt="Logo Pedukuhan Dukuh" width={200} height={100}
+          // style={{ width: 'auto', height: 'auto' }} 
+          />
       </AnimatedContent>
       <article className="flex flex-col gap-2 my-4">
 

@@ -225,6 +225,7 @@ export default function KelolaJelajahDukuhPage() {
       'Kuliner': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
       'Kerajinan': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
       'Jasa': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+      'Kegiatan': 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
       'Lainnya': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
     }
     return colors[category] || colors['Lainnya']
