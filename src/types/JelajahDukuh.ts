@@ -5,6 +5,7 @@ export const KATEGORI = [
   'Kuliner',
   'Kerajinan',
   'Jasa',
+  'Kegiatan',
   'Lainnya'
 ] as const
 

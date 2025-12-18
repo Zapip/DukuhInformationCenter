@@ -51,7 +51,7 @@ const ExploreCard = () => {
         return (
             <section className="w-full flex justify-center gap-2 items-center h-screen">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                <p className="text-gray-500 text-lg animate-pulse">Memuat data UMKM...</p>
+                <p className="text-gray-500 text-lg animate-pulse">Sedang Memuat data...</p>
             </section>
         );
     return (
