@@ -18,6 +18,22 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Loader2, Search } from 'lucide-react';
 
+// Format date to Indonesian format: Hari, DD Bulan YYYY
+const formatDate = (date: string | Date | undefined) => {
+    if (!date) return 'Tanggal tidak tersedia';
+
+    const d = new Date(date);
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    const dayName = days[d.getDay()];
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+
+    return `${dayName}, ${day} ${month} ${year}`;
+};
+
 
 const ExploreCard = () => {
     const [jelajah, setJelajah] = useState<JelajahDukuh[]>([]);
@@ -105,7 +121,7 @@ const ExploreCard = () => {
                                     </article>
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className='flex flex-col gap-2'>
                                 <Image
                                     src={jelajahItem.image_url ?? "/placeholder.webp"}
                                     alt={jelajahItem.nama_usaha}
@@ -113,6 +129,9 @@ const ExploreCard = () => {
                                     height={240}
                                     className="rounded-md object-cover w-full h-48"
                                 />
+                                <p className="text-xs text-gray-500 w-full text-right">
+                                    Diterbitkan pada {formatDate(jelajahItem.created_at)}
+                                </p>
                             </CardContent>
                         </Card>
                     </DialogTrigger>
@@ -123,6 +142,9 @@ const ExploreCard = () => {
                             <DialogDescription><Badge className="text-white">{selectedJelajah?.kategori_usaha}</Badge></DialogDescription>
                         </DialogHeader>
                         <article className="flex flex-col gap-4">
+                            <p className="text-xs text-gray-500 w-full">
+                                Diterbitkan pada {formatDate(jelajahItem.created_at)}
+                            </p>
                             <Image
                                 src={selectedJelajah?.image_url ?? "/placeholder.webp"}
                                 alt={selectedJelajah?.nama_usaha ?? ""}

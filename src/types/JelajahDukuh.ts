@@ -18,7 +18,7 @@ interface JelajahDukuh {
     link_maps?: string;
     image_url: string;
     kontak: string;
-    timestamp?: string | Date;
+    created_at?: string | Date;
 }
 
 export type { JelajahDukuh };
